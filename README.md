@@ -28,3 +28,9 @@
 ```bash
 git clone https://github.com/marlonvpaula/filmes-api.git
 cd filmes-api
+```
+
+### Testando a Consulta de Intervalos de Prêmios:
+
+GET
+http://localhost:8080/movie/intervalopremio

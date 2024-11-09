@@ -33,10 +33,24 @@ public record MovieService (MovieRepository movieRepository) {
         MovieResult result = new MovieResult();
         List<MovieDto> listMin = new ArrayList<>();
         List<MovieDto> listMax = new ArrayList<>();
+
+        if (list.isEmpty()) {
+            return result;
+        }
+
         listMin.add(list.get(0));
-        listMin.add(list.get(1));
-        listMax.add(list.get(list.size()-1));
-        listMax.add(list.get(list.size()-2));
+        if (list.size() == 2) {
+            listMax.add(list.get(1));
+        }
+        if (list.size() == 3) {
+            listMin.add(list.get(1));
+            listMax.add(list.get(list.size()-1));
+        }
+        if (list.size() >= 4) {
+            listMin.add(list.get(1));
+            listMax.add(list.get(list.size()-1));
+            listMax.add(list.get(list.size()-2));
+        }
 
         result.setMax(listMax);
         result.setMin(listMin);

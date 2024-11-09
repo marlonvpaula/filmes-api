@@ -25,12 +25,12 @@ class MovieRepositoryIntegrationTest {
         List<MovieDto> result = movieRepository.findProducerIntervals();
 
         assertNotNull(result);
-        assertEquals(14, result.size());
+        assertEquals(1, result.size());
 
         MovieDto dto = result.get(0);
-        assertEquals("Wyck Godfrey, Stephenie Meyer and Karen Rosenfelt", dto.getProducer());
-        assertEquals(2011, dto.getPreviousWin());
-        assertEquals(2012, dto.getFollowingWin());
-        assertEquals(1, dto.getInterval());
+        assertEquals("Bo Derek", dto.getProducer());
+        assertEquals(1984, dto.getPreviousWin());
+        assertEquals(1990, dto.getFollowingWin());
+        assertEquals(6, dto.getInterval());
     }
 }

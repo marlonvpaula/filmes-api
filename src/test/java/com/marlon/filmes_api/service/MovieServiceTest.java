@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 class MovieServiceTest {
@@ -58,20 +59,82 @@ class MovieServiceTest {
     }
 
     @Test
-    void testGetIntervaloPremio() {
-        MovieDto dto1 = new MovieDto("Producer A", 2000L, 2005L, 5L);
-        MovieDto dto2 = new MovieDto("Producer B", 1995L, 2003L, 8L);
-        List<MovieDto> movieDtos = Arrays.asList(dto1, dto2, dto2, dto1);
+    void testGetIntervaloPremioWhenListIsEmpty() {
+        // Configuração do cenário de teste: lista vazia
+        when(movieRepository.findProducerIntervals()).thenReturn(new ArrayList<>());
 
-        when(movieRepository.findProducerIntervals()).thenReturn(movieDtos);
+        // Execução
+        MovieResult result = movieService.getIntervaloPremio();
+
+        // Verificações
+        assertTrue(result.getMin().isEmpty(), "A lista de intervalos mínimos deve estar vazia.");
+        assertTrue(result.getMax().isEmpty(), "A lista de intervalos máximos deve estar vazia.");
+    }
+
+    @Test
+    void testGetIntervaloPremioWhenListHasOneElement() {
+        List<MovieDto> list = List.of(new MovieDto("Producer1", 2000L, 2005L, 5L));
+        when(movieRepository.findProducerIntervals()).thenReturn(list);
 
         MovieResult result = movieService.getIntervaloPremio();
 
-        verify(movieRepository, times(1)).findProducerIntervals();
-        assertEquals(2, result.getMin().size());
-        assertEquals(2, result.getMax().size());
-        assertEquals("Producer A", result.getMin().get(0).getProducer());
-        assertEquals("Producer B", result.getMax().get(1).getProducer());
+        assertEquals(1, result.getMin().size(), "A lista de intervalos mínimos deve ter 1 elemento.");
+        assertEquals(list.get(0), result.getMin().get(0));
+        assertTrue(result.getMax().isEmpty(), "A lista de intervalos máximos deve estar vazia.");
+    }
+
+    @Test
+    void testGetIntervaloPremioWhenListHasTwoElements() {
+        List<MovieDto> list = List.of(
+                new MovieDto("Producer1", 2000L, 2005L, 5L),
+                new MovieDto("Producer2", 2010L, 2015L, 5L)
+        );
+        when(movieRepository.findProducerIntervals()).thenReturn(list);
+
+        MovieResult result = movieService.getIntervaloPremio();
+
+        assertEquals(1, result.getMin().size(), "A lista de intervalos mínimos deve ter 1 elemento.");
+        assertEquals(list.get(0), result.getMin().get(0));
+        assertEquals(1, result.getMax().size(), "A lista de intervalos máximos deve ter 1 elemento.");
+        assertEquals(list.get(1), result.getMax().get(0));
+    }
+
+    @Test
+    void testGetIntervaloPremioWhenListHasThreeElements() {
+        List<MovieDto> list = List.of(
+                new MovieDto("Producer1", 2000L, 2005L, 5L),
+                new MovieDto("Producer2", 2006L, 2010L, 4L),
+                new MovieDto("Producer3", 2011L, 2016L, 5L)
+        );
+        when(movieRepository.findProducerIntervals()).thenReturn(list);
+
+        MovieResult result = movieService.getIntervaloPremio();
+
+        assertEquals(2, result.getMin().size(), "A lista de intervalos mínimos deve ter 2 elementos.");
+        assertEquals(list.get(0), result.getMin().get(0));
+        assertEquals(list.get(1), result.getMin().get(1));
+        assertEquals(1, result.getMax().size(), "A lista de intervalos máximos deve ter 1 elemento.");
+        assertEquals(list.get(2), result.getMax().get(0));
+    }
+
+    @Test
+    void testGetIntervaloPremioWhenListHasFourOrMoreElements() {
+        List<MovieDto> list = List.of(
+                new MovieDto("Producer1", 2000L, 2005L, 5L),
+                new MovieDto("Producer2", 2006L, 2010L, 4L),
+                new MovieDto("Producer3", 2011L, 2015L, 4L),
+                new MovieDto("Producer4", 2016L, 2021L, 5L)
+        );
+        when(movieRepository.findProducerIntervals()).thenReturn(list);
+
+        MovieResult result = movieService.getIntervaloPremio();
+
+        assertEquals(2, result.getMin().size(), "A lista de intervalos mínimos deve ter 2 elementos.");
+        assertEquals(list.get(0), result.getMin().get(0));
+        assertEquals(list.get(1), result.getMin().get(1));
+        assertEquals(2, result.getMax().size(), "A lista de intervalos máximos deve ter 2 elementos.");
+        assertEquals(list.get(3), result.getMax().get(0));
+        assertEquals(list.get(2), result.getMax().get(1));
     }
 
     @Test
